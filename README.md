@@ -345,6 +345,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 ### 🌟 Projeyi Beğendiyseniz Yıldız Vermeyi Unutmayın!
 
 **Made with ❤️ by Jobverse Team**
+**2025**
 
 [⬆ Başa Dön](#-jobverse---i̇ş-trendleri-analiz-platformu)
 
