@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Jobverse Logo](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Logo (2).png)
+![Jobverse Logo](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Logo.png)
 
 **İş ilanlarını analiz eden, trendleri keşfeden ve geleceği öngören yapay zeka destekli platform projesi.**
 
