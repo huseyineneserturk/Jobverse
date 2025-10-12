@@ -302,7 +302,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
   <tr>
     <td align="center">
       <a href="https://github.com/huseyineneserturk">
-        <img src="https://github.com/huseyineneserturk.png" width="100px;" alt="Hüseyin Enes Ertürk"/>
+        <img src="https://avatars.githubusercontent.com/u/47718441?v=4"/>
         <br />
         <sub><b>Hüseyin Enes Ertürk</b></sub>
       </a>
