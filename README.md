@@ -320,7 +320,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
       <br />
       <sub>Data Analyst</sub>
       <br />
-      🤖 ML/AI | 📊 Data Analysis | 🔍 NLP
+      📊 Data Analysis
     </td>
     <td align="center">
       <a href="https://github.com/ishakkaratas05">
