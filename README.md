@@ -99,19 +99,22 @@ Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini h
 <summary><b>🎯 Sprint Hedefleri</b></summary>
 
 #### Tamamlanan Görevler
-- [x] Proje mimarisi oluşturulması
+- [x] Proje fikri
+- [x] Fonksiyonel gereksinimler
+- [x] Kullanılacak teknolojiler
+- [x] Sunum
 
 #### Teknik Detaylar
-- PostgreSQL veritabanı kurulumu
+- 
 
 #### Çıktılar
-- Çalışan backend API
+- Sunum dosyası hazırlandı.
 
 </details>
 
 #### Sprint 1 Sonuçları
 
-![Sprint 1 Grafik](https://via.placeholder.com/800x400/10B981/FFFFFF?text=Sprint+1+Burndown+Chart)
+![Sprint 1 Grafik](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Jira_Board/Jira_Board_1.png)
 
 ---
 
