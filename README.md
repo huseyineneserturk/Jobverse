@@ -110,6 +110,10 @@ Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini h
 #### Çıktılar
 - Sunum dosyası hazırlandı.
 
+#### Sunum
+
+![Sprint 1 Sunum](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Presentations/VTYS%20Proje%20Sunumu-1.pdf)
+
 </details>
 
 #### Sprint 1 Sonuçları
