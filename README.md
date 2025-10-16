@@ -35,7 +35,7 @@
 
 ## 💡 Proje Hakkında
 
-Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini haritalayan ve kariyer planlaması için öngörüler sunan kapsamlı bir analiz platformudur. Binlerce iş ilanını otomatik olarak toplar, yapay zeka ile işler ve kullanıcılara anlamlı veriler sunar.
+Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini haritalayan ve kariyer planlaması için öngörüler sunan kapsamlı bir analiz platformudur. Binlerce iş ilanını otomatik olarak toplar.
 
 ### 🎯 Proje Hedefleri
 
@@ -43,7 +43,6 @@ Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini h
 - Sektörel trendleri görselleştirmek
 - En çok talep gören becerileri belirlemek
 - Maaş aralıklarını ve şirket kültürünü analiz etmek
-- Kullanıcılara kişiselleştirilmiş kariyer önerileri sunmak
 
 ---
 
