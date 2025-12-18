@@ -1,15 +1,4 @@
-name: Haftalik Jobverse Analizi
-
-on:
-  schedule:
-    - cron: '0 9 * * 0'
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
+steps:
       - name: Depoyu Cek
         uses: actions/checkout@v3
 
@@ -18,13 +7,16 @@ jobs:
         with:
           python-version: '3.9'
 
-      # DÜZELTME 1: requirements.txt dosyasının tam yolunu verdik
-      # Tırnak işaretleri önemli çünkü klasör adında boşluk var.
+      # --- YENİ EKLENECEK KISIM (Dedektif) ---
+      - name: Dosyalari Listele (DEBUG)
+        run: ls -R
+      # ---------------------------------------
+
       - name: Kutuphaneleri Yukle
         run: |
+          # Burada tırnak işaretine dikkat ediyoruz ama isim yanlışsa yine patlar
           pip install -r "Jobverse Automated/requirements.txt"
 
-      # DÜZELTME 2: Python dosyasının yeni adını ve tam yolunu verdik
       - name: Analizi Calistir
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
