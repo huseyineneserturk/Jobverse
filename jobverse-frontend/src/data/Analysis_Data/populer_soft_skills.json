@@ -1,0 +1,26 @@
+[
+    {
+        "soft_skill":"Agile",
+        "count":116
+    },
+    {
+        "soft_skill":"Communication",
+        "count":104
+    },
+    {
+        "soft_skill":"English",
+        "count":29
+    },
+    {
+        "soft_skill":"Leadership",
+        "count":21
+    },
+    {
+        "soft_skill":"Teamwork",
+        "count":11
+    },
+    {
+        "soft_skill":"Problem Solving",
+        "count":7
+    }
+]

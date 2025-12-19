@@ -1,0 +1,14 @@
+[
+    {
+        "education_level":"Bachelor",
+        "count":142
+    },
+    {
+        "education_level":"Master",
+        "count":32
+    },
+    {
+        "education_level":"PhD",
+        "count":0
+    }
+]

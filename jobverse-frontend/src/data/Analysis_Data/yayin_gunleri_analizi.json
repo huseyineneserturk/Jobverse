@@ -1,0 +1,30 @@
+[
+    {
+        "day":"Monday",
+        "count":18
+    },
+    {
+        "day":"Tuesday",
+        "count":31
+    },
+    {
+        "day":"Wednesday",
+        "count":13
+    },
+    {
+        "day":"Thursday",
+        "count":56
+    },
+    {
+        "day":"Friday",
+        "count":28
+    },
+    {
+        "day":"Saturday",
+        "count":12
+    },
+    {
+        "day":"Sunday",
+        "count":24
+    }
+]

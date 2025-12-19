@@ -1,0 +1,42 @@
+[
+    {
+        "city":"Arlington",
+        "count":40
+    },
+    {
+        "city":"Washington",
+        "count":32
+    },
+    {
+        "city":"McLean",
+        "count":25
+    },
+    {
+        "city":"Alexandria",
+        "count":19
+    },
+    {
+        "city":"Reston",
+        "count":14
+    },
+    {
+        "city":"Lorton",
+        "count":9
+    },
+    {
+        "city":"Fairfax",
+        "count":8
+    },
+    {
+        "city":"Springfield",
+        "count":7
+    },
+    {
+        "city":"College Park",
+        "count":7
+    },
+    {
+        "city":"Annapolis",
+        "count":7
+    }
+]

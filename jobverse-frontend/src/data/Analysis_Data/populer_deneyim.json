@@ -1,0 +1,18 @@
+[
+    {
+        "experience_level":"3-5 Years (Mid)",
+        "count":100
+    },
+    {
+        "experience_level":"5-8 Years (Senior)",
+        "count":27
+    },
+    {
+        "experience_level":"8+ Years (Lead)",
+        "count":27
+    },
+    {
+        "experience_level":"0-2 Years (Junior)",
+        "count":14
+    }
+]

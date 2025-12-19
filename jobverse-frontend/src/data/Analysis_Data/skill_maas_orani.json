@@ -1,0 +1,38 @@
+[
+    {
+        "skill":"Python",
+        "avg_salary":160281.89
+    },
+    {
+        "skill":"React",
+        "avg_salary":159818.18
+    },
+    {
+        "skill":"JavaScript",
+        "avg_salary":153840.59
+    },
+    {
+        "skill":"Java",
+        "avg_salary":148733.41
+    },
+    {
+        "skill":"AWS",
+        "avg_salary":148265.16
+    },
+    {
+        "skill":"C++",
+        "avg_salary":145951.2
+    },
+    {
+        "skill":"Go",
+        "avg_salary":144243.64
+    },
+    {
+        "skill":"SQL",
+        "avg_salary":133062.35
+    },
+    {
+        "skill":"Machine Learning",
+        "avg_salary":48.35
+    }
+]
