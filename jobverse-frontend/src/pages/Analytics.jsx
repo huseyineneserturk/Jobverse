@@ -192,8 +192,8 @@ const Analytics = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === tab.id
-                  ? 'bg-[#0f172a] dark:bg-sky-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                ? 'bg-[#0f172a] dark:bg-sky-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
             >
               {tab.label}
@@ -203,35 +203,100 @@ const Analytics = () => {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Remote Oranı */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-200">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 transition-colors duration-200">Remote Çalışma Oranı</h3>
-              <PieChart data={remoteOrani} size={200} />
+          <div className="space-y-6">
+            {/* İstatistik Kartları */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
+                <p className="text-blue-100 text-sm">Toplam İlan</p>
+                <p className="text-3xl font-bold">{populerUnvanlar.reduce((sum, item) => sum + item.count, 0).toLocaleString()}</p>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-5 text-white shadow-lg">
+                <p className="text-emerald-100 text-sm">Remote İlan</p>
+                <p className="text-3xl font-bold">{remoteOrani.find(r => r.is_remote)?.count?.toLocaleString() || '0'}</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+                <p className="text-purple-100 text-sm">Ortalama Maaş</p>
+                <p className="text-3xl font-bold">{formatCurrency(maasOranlari.reduce((sum, item) => sum + item.avg_salary, 0) / maasOranlari.length)}</p>
+              </div>
+              <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-5 text-white shadow-lg">
+                <p className="text-amber-100 text-sm">Farklı Yetenek</p>
+                <p className="text-3xl font-bold">{populerYetenekler.length}</p>
+              </div>
             </div>
 
-            {/* Top Unvanlar */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-200">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 transition-colors duration-200">Popüler Unvanlar</h3>
-              <BarChart
-                data={populerUnvanlar.slice(0, 5)}
-                labelKey="job_title"
-                valueKey="count"
-                maxValue={getMaxCount(populerUnvanlar)}
-                color="bg-purple-500"
-              />
+            {/* Ana Grafikler */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Remote Oranı */}
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2 transition-colors duration-200">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  Remote Çalışma Oranı
+                </h3>
+                <PieChart data={remoteOrani} size={180} />
+              </div>
+
+              {/* Top Unvanlar */}
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2 transition-colors duration-200">
+                  <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+                  En Popüler Unvanlar
+                </h3>
+                <BarChart
+                  data={populerUnvanlar.slice(0, 5)}
+                  labelKey="job_title"
+                  valueKey="count"
+                  maxValue={getMaxCount(populerUnvanlar)}
+                  color="bg-gradient-to-r from-purple-500 to-purple-600"
+                />
+              </div>
+
+              {/* Yayın Günleri */}
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2 transition-colors duration-200">
+                  <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                  Yayın Günleri
+                </h3>
+                <BarChart
+                  data={yayinGunleriAnalizi}
+                  labelKey="day"
+                  valueKey="count"
+                  maxValue={getMaxCount(yayinGunleriAnalizi)}
+                  color="bg-gradient-to-r from-orange-500 to-orange-600"
+                />
+              </div>
             </div>
 
-            {/* Yayın Günleri */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-200">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 transition-colors duration-200">Yayın Günleri</h3>
-              <BarChart
-                data={yayinGunleriAnalizi}
-                labelKey="day"
-                valueKey="count"
-                maxValue={getMaxCount(yayinGunleriAnalizi)}
-                color="bg-orange-500"
-              />
+            {/* Alt Grafikler */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top Yetenekler */}
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2 transition-colors duration-200">
+                  <span className="w-3 h-3 bg-indigo-500 rounded-full"></span>
+                  En Çok Aranan Yetenekler
+                </h3>
+                <BarChart
+                  data={populerYetenekler.slice(0, 8)}
+                  labelKey="skill"
+                  valueKey="count"
+                  maxValue={getMaxCount(populerYetenekler)}
+                  color="bg-gradient-to-r from-indigo-500 to-indigo-600"
+                />
+              </div>
+
+              {/* Top Şehirler */}
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2 transition-colors duration-200">
+                  <span className="w-3 h-3 bg-teal-500 rounded-full"></span>
+                  En Çok İlan Olan Şehirler
+                </h3>
+                <BarChart
+                  data={populerSehirler.slice(0, 8)}
+                  labelKey="city"
+                  valueKey="count"
+                  maxValue={getMaxCount(populerSehirler)}
+                  color="bg-gradient-to-r from-teal-500 to-teal-600"
+                />
+              </div>
             </div>
           </div>
         )}

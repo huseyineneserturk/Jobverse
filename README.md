@@ -1,405 +1,184 @@
-# 🚀 Jobverse - İş Trendleri Analiz Platformu
+# 🚀 Jobverse - İş Arama ve Kariyer Platformu
 
 <div align="center">
 
 ![Jobverse Logo](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Logo_With_Background.png)
 
-**İş ilanlarını analiz eden, trendleri keşfeden platform projesi.**
+**İş ilanlarını keşfedin, kariyerinizi planlayın, AI destekli mülakat simülasyonları ile hazırlanın.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-
-[Demo](#-demo) • [Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Kullanım](#-kullanım) • [Katkıda Bulunun](#-katkıda-bulunma)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-jobverse.tech-blue?style=for-the-badge)](https://jobverse.tech)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
 
 </div>
 
 ---
 
-## 📋 İçindekiler
-
-- [Proje Hakkında](#-proje-hakkında)
-- [Demo](#-demo)
-- [Özellikler](#-özellikler)
-- [Teknolojiler](#-teknolojiler)
-- [Sprint Planı](#-sprint-planı)
-- [Kurulum](#-kurulum)
-- [Kullanım](#-kullanım)
-- [Ekran Görüntüleri](#-ekran-görüntüleri)
-- [API Dokümantasyonu](#-api-dokümantasyonu)
-- [Katkıda Bulunma](#-katkıda-bulunma)
-- [Lisans](#-lisans)
-- [Ekip](#-ekip)
-
----
-
-## 💡 Proje Hakkında
-
-Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini haritalayan ve kariyer planlaması için öngörüler sunan kapsamlı bir analiz platformudur. Binlerce iş ilanını otomatik olarak toplar.
-
-### 🎯 Proje Hedefleri
-
-- İş ilanlarını otomatik olarak toplamak ve kategorize etmek
-- Sektörel trendleri görselleştirmek
-- En çok talep gören becerileri belirlemek
-- Maaş aralıklarını ve şirket kültürünü analiz etmek
-
----
-
-## 🎬 Demo
-
-### Video Tanıtım
-
-[![Jobverse Demo Video](https://via.placeholder.com/800x450/1E293B/FFFFFF?text=Demo+Video+-+Tıklayın)](https://www.youtube.com/watch?v=demo)
-
-> 📹 **Not:** Demo videosu yüklenecek - Projenin tüm özelliklerini gösteren detaylı bir tanıtım
-
----
-
 ## ✨ Özellikler
 
-### 🔍 Veri Toplama ve İşleme
-- 
-
-### 📊 Analiz ve Görselleştirme
-- 
-
-### 🤖 Yapay Zeka Özellikleri
-- 
-
-### 👤 Kullanıcı Özellikleri
-- 
+| Özellik | Açıklama |
+|---------|----------|
+| 🔍 **İş Arama** | MongoDB'den binlerce iş ilanını arayın ve filtreleyin |
+| 📊 **Analitik Dashboard** | İş piyasası trendleri, maaş analizleri, popüler yetenekler |
+| 🤖 **AI Mülakat Simülasyonu** | Gemini AI ile gerçekçi mülakat pratikleri |
+| 💬 **AI Kariyer Asistanı** | Kariyer sorularınıza anında cevaplar |
+| 📄 **CV Uygunluk Skoru** | CV'niz ile iş ilanı arasındaki uyumu ölçün |
+| 💾 **İlan Kaydetme** | Beğendiğiniz ilanları kaydedin |
+| 👤 **Profil Yönetimi** | Fotoğraf, eğitim, CV yükleme |
+| 🌙 **Dark Mode** | Göz yormayan karanlık tema |
 
 ---
 
 ## 🛠️ Teknolojiler
 
-### Backend
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-
-
 ### Frontend
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+- **React 18** + Vite
+- **TailwindCSS** - Modern UI
+- **Firebase Auth** - Kimlik doğrulama
+- **Firebase Storage** - Dosya yükleme
 
+### Backend
+- **Node.js + Express** - API sunucusu
+- **TypeScript** - Tip güvenliği
+- **MongoDB** - Veritabanı
+- **Gemini AI** - AI özellikleri
 
-### Veri Analizi ve ML
-- **Pandas** - Veri manipülasyonu
-
-### DevOps
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
----
-
-## 📅 Sprint Planı
-
-### Sprint 1: Temel Altyapı ve Veri Toplama (Hafta 1)
-
-<details>
-<summary><b>🎯 Sprint Hedefleri</b></summary>
-
-#### Tamamlanan Görevler
-- [x] Proje fikri
-- [x] Fonksiyonel gereksinimler
-- [x] Kullanılacak teknolojiler
-- [x] Sunum
-
-#### Teknik Detaylar
-- 
-
-#### Çıktılar
-- Sunum dosyası hazırlandı.
-
-#### Sunum
-
-![Sprint 1 Sunum](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Presentations/VTYS%20Proje%20Sunumu-1.pdf)
-
-</details>
-
-#### Sprint 1 Sonuçları
-
-![Sprint 1 Grafik](https://github.com/huseyineneserturk/Jobverse/blob/main/Resources/Jira_Board/Jira_Board_1.png)
-
----
-
-### Sprint 2: Veri İşleme ve Analiz (Hafta 2)
-
-<details>
-<summary><b>🎯 Sprint Hedefleri</b></summary>
-
-#### Tamamlanan Görevler
-- [x] Veri temizleme pipeline'ı
-
-#### Teknik Detaylar
-- SpaCy ile entity recognition
-
-#### Çıktılar
-- Temiz ve kategorize edilmiş veri seti
-
-</details>
-
-#### Sprint 2 Sonuçları
-
-![Sprint 2 Grafik](https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=Sprint+2+Burndown+Chart)
-
----
-
-### Sprint 3: Frontend ve Görselleştirme (Hafta 3)
-
-<details>
-<summary><b>🎯 Sprint Hedefleri</b></summary>
-
-#### Tamamlanan Görevler
-- [x] React projesi kurulumu
-
-#### Teknik Detaylar
-- React komponenti mimarisi
-
-#### Çıktılar
-- Kullanıcı dostu arayüz
-
-</details>
-
-#### Sprint 3 Sonuçları
-
-![Sprint 3 Grafik](https://via.placeholder.com/800x400/8B5CF6/FFFFFF?text=Sprint+3+Burndown+Chart)
-
----
-
-### Sprint 4: Özellik Geliştirme ve Test (Hafta 4)
-
-<details>
-<summary><b>🎯 Sprint Hedefleri</b></summary>
-
-#### Tamamlanan Görevler
-- [x] Kullanıcı kimlik doğrulama sistemi
-
-#### Teknik Detaylar
-- JWT authentication
-
-#### Çıktılar
-- Production-ready uygulama
-
-</details>
-
-#### Sprint 4 Sonuçları
-
-![Sprint 4 Grafik](https://via.placeholder.com/800x400/EF4444/FFFFFF?text=Sprint+4+Burndown+Chart)
+### Deployment
+- **Digital Ocean** - Cloud hosting
+- **Nginx** - Reverse proxy
+- **PM2** - Process manager
+- **Let's Encrypt** - SSL sertifikası
 
 ---
 
 ## 🚀 Kurulum
 
 ### Gereksinimler
-
 - Node.js 18+
 - MongoDB Atlas hesabı
 - Firebase projesi
 - Gemini API Key
 
-### Backend Kurulumu
-
+### 1. Projeyi Klonlayın
 ```bash
-# Backend klasörüne git
+git clone https://github.com/huseyineneserturk/Jobverse.git
+cd Jobverse
+```
+
+### 2. Backend Kurulumu
+```bash
 cd jobverse-backend
-
-# Bağımlılıkları yükle
 npm install
-
-# .env dosyasını oluştur
 cp .env.example .env
-# .env dosyasını düzenle ve gerekli değerleri gir
-
-# Development modunda çalıştır
+# .env dosyasını düzenleyin
 npm run dev
-
-# Production build
-npm run build
 ```
 
-### Frontend Kurulumu
-
+### 3. Frontend Kurulumu
 ```bash
-# Frontend klasörüne git
 cd jobverse-frontend
-
-# Bağımlılıkları yükle
 npm install
-
-# .env dosyasını oluştur
-cp .env.example .env
-# API URL'ini ayarla
-
-# Development modunda çalıştır
 npm run dev
-
-# Production build
-npm run build
 ```
 
-### 🌐 Digital Ocean Deploy
+### 4. Tarayıcıda Açın
+```
+http://localhost:5173
+```
 
+---
+
+## 🌐 Production Deploy
+
+### Digital Ocean
 ```bash
-# Sunucuya SSH ile bağlan
 ssh root@YOUR_SERVER_IP
-
-# Repo'yu klonla
 git clone https://github.com/huseyineneserturk/Jobverse.git
 cd Jobverse
 
-# Deploy scriptini çalıştır
-chmod +x deploy.sh
-./deploy.sh
+# Backend
+cd jobverse-backend
+npm install && npm run build
+
+# Frontend
+cd ../jobverse-frontend
+npm install && npm run build
+
+# PM2 ile başlat
+cd ..
+pm2 start ecosystem.config.js
 ```
 
-**DNS Ayarları (jobverse.tech):**
+### DNS Ayarları
 ```
-A Record: @ → Server IP
-A Record: www → Server IP
-A Record: api → Server IP
+A Record: @   → SERVER_IP
+A Record: www → SERVER_IP
+A Record: api → SERVER_IP
 ```
 
 ---
 
-## 📖 Kullanım
-
-### Veri Toplama
-
-```python
+## 📁 Proje Yapısı
 
 ```
-
-### API Kullanımı
-
-```bash
-
+Jobverse/
+├── jobverse-backend/       # Express + TypeScript API
+│   ├── src/
+│   │   ├── controllers/    # İş mantığı
+│   │   ├── models/         # MongoDB modelleri
+│   │   ├── routes/         # API rotaları
+│   │   └── config/         # Yapılandırma
+│   └── .env.example
+│
+├── jobverse-frontend/      # React + Vite
+│   ├── src/
+│   │   ├── components/     # UI bileşenleri
+│   │   ├── pages/          # Sayfa bileşenleri
+│   │   ├── context/        # React context
+│   │   └── services/       # API servisleri
+│   └── .env.example
+│
+├── Resources/              # Logo ve görseller
+├── ecosystem.config.js     # PM2 yapılandırması
+├── nginx.conf              # Nginx yapılandırması
+└── README.md
 ```
-
-### Dashboard Erişimi
-
 
 ---
 
-## 📸 Ekran Görüntüleri
+## 🔑 API Endpoints
 
-### Ana Dashboard
-![Dashboard](https://via.placeholder.com/800x500/1E293B/FFFFFF?text=Ana+Dashboard)
-
-### Trend Analizi
-![Trend Analysis](https://via.placeholder.com/800x500/0F172A/FFFFFF?text=Trend+Analizi)
-
-### Beceri Haritası
-![Skills Map](https://via.placeholder.com/800x500/334155/FFFFFF?text=Beceri+Haritası)
-
-### Maaş Analizi
-![Salary Analysis](https://via.placeholder.com/800x500/475569/FFFFFF?text=Maaş+Analizi)
-
----
-
-## 📡 API Dokümantasyonu
-
-### Endpoints
-
-#### İş İlanları
-
-```
-
-```
-
-#### Analitik
-
-```
-
-```
-
-#### Kullanıcı
-
-```
-
-```
-
-
----
-
-## 🤝 Katkıda Bulunma
-
-Katkılarınızı bekliyoruz! Katkıda bulunmak için:
-
-1. Bu repository'yi fork edin
-2. Feature branch'i oluşturun (`git checkout -b feature/AmazingFeature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'feat: Add some AmazingFeature'`)
-4. Branch'inizi push edin (`git push origin feature/AmazingFeature`)
-5. Pull Request oluşturun
-
-### Geliştirme Kuralları
-
-- PEP 8 kod standartlarına uyun
-- Yeni özellikler için test yazın
-- Commit mesajlarında Conventional Commits kullanın
-- Dokümantasyonu güncel tutun
-
----
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+| Method | Endpoint | Açıklama |
+|--------|----------|----------|
+| GET | `/api/jobs` | İş ilanları listesi |
+| GET | `/api/jobs/:id` | Tek iş ilanı |
+| GET | `/api/analytics/charts` | Grafik verileri |
+| POST | `/api/ai/interview-questions` | Mülakat soruları (Auth) |
+| POST | `/api/ai/analyze-answer` | Cevap analizi (Auth) |
+| POST | `/api/ai/chat` | Chatbot (Auth) |
+| POST | `/api/ai/job-match` | CV uygunluk skoru (Auth) |
 
 ---
 
 ## 👥 Ekip
 
-<div align="center">
+| İsim | Rol | GitHub |
+|------|-----|--------|
+| Hüseyin Enes Ertürk | Full Stack Developer | [@huseyineneserturk](https://github.com/huseyineneserturk) |
 
-### Proje Geliştiricileri
+---
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/huseyineneserturk">
-        <img src="https://avatars.githubusercontent.com/u/47718441?v=4"/>
-        <br />
-        <sub><b>Hüseyin Enes Ertürk</b></sub>
-      </a>
-      <br />
-      <sub>Backend Developer & Frontend Developer & Scrum Master</sub>
-      <br />
-      🔧 Backend | 🗄️ Frontend | 🎯 Project Management
-    </td>
-    <td align="center">
-      <a href="https://github.com/AlperenYasemin">
-        <img src="https://avatars.githubusercontent.com/u/57956644?v=4"/>
-        <br />
-        <sub><b>Alperen Yasemin</b></sub>
-      </a>
-      <br />
-      <sub>Data Analyst</sub>
-      <br />
-      📊 Data Analysis
-    </td>
-    <td align="center">
-      <a href="https://github.com/ishakkaratas05">
-        <img src="https://avatars.githubusercontent.com/u/170670866?v=4"/>
-        <br />
-        <sub><b>İshak Karataş</b></sub>
-      </a>
-      <br />
-      <sub>Backend Developer & Frontend Developer </sub>
-      <br />
-      🔧 Backend | 🗄️ Frontend
-    </td>
-  </tr>
-</table>
+## 📄 Lisans
 
-</div>
+Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.
 
 ---
 
 <div align="center">
 
-### 🌟 Projeyi Beğendiyseniz Yıldız Vermeyi Unutmayın!
+**⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!**
 
-**Made with ❤️ by Jobverse Team**
-**2025**
-
-[⬆ Başa Dön](#-jobverse---i̇ş-trendleri-analiz-platformu)
+[🌐 Demo](https://jobverse.tech) • [📧 İletişim](mailto:huseyineneserturk@gmail.com)
 
 </div>

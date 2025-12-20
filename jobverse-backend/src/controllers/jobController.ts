@@ -16,11 +16,8 @@ export const getJobs = async (req: Request, res: Response): Promise<void> => {
         const filters: any = {};
 
         if (req.query.search) {
-            filters.$or = [
-                { job_title: { $regex: req.query.search, $options: 'i' } },
-                { job_description: { $regex: req.query.search, $options: 'i' } },
-                { employer_name: { $regex: req.query.search, $options: 'i' } }
-            ];
+            // Sadece iş başlığına göre arama
+            filters.job_title = { $regex: req.query.search, $options: 'i' };
         }
 
         if (req.query.location) {

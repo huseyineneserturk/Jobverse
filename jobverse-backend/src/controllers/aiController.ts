@@ -37,8 +37,11 @@ export const generateInterviewQuestions = async (req: Request, res: Response): P
       Şirket: ${jobData?.company || 'Teknoloji Şirketi'}
       Açıklama: ${jobData?.description || ''}
       
-      Lütfen 5-7 adet mülakat sorusu oluştur. Sorular teknik ve davranışsal soruları içermeli.
-      Sadece soruları listeleyin, numaralandırmadan.
+      SADECE 5-7 adet mülakat sorusu yaz. Her satıra bir soru.
+      Giriş cümlesi, açıklama veya kapanış yazma. SADECE sorular.
+      Örnek format:
+      Bu pozisyon için neden uygun olduğunuzu düşünüyorsunuz?
+      Ekip çalışması deneyimlerinizden bahseder misiniz?
     `;
 
         const response = await fetch(`${GEMINI_API_URL}?key=${config.geminiApiKey}`, {
@@ -56,10 +59,24 @@ export const generateInterviewQuestions = async (req: Request, res: Response): P
         const data = await response.json() as GeminiResponse;
         const questionsText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
+        // Giriş cümlelerini filtrele
+        const excludePatterns = [
+            /^(işte|buyrun|elbette|tabii|merhaba|aşağıda)/i,
+            /^(mülakat|soru|örnek)/i,
+            /^[\*\-\•]/,
+        ];
+
         const questions = questionsText
             .split('\n')
-            .filter((line: string) => line.trim() && line.trim().length > 10)
-            .map((line: string) => line.replace(/^\d+[\.)\\s]*/, '').trim())
+            .map((line: string) => line.replace(/^[\d\*\-\•\.]+\s*/, '').trim())
+            .filter((line: string) => {
+                if (line.length < 15) return false;
+                if (!line.includes('?')) return false;
+                for (const pattern of excludePatterns) {
+                    if (pattern.test(line)) return false;
+                }
+                return true;
+            })
             .slice(0, 7);
 
         res.json({
