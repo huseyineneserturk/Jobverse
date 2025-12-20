@@ -121,24 +121,24 @@ graph LR
 <td align="center" width="33%">
 <img src="https://github.com/huseyineneserturk.png" width="150px;" alt="Hüseyin Enes Ertürk"/><br />
 <sub><b>Hüseyin Enes Ertürk</b></sub><br />
-<sub>Full Stack Developer</sub><br />
+<sub>Backend Developer</sub><br />
 <a href="https://github.com/huseyineneserturk">
 <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
 </a>
 </td>
 <td align="center" width="33%">
-<img src="https://github.com/sedatzengin.png" width="150px;" alt="Contributor 2"/><br />
-<sub><b>Sedat Zengin</b></sub><br />
-<sub>Developer</sub><br />
-<a href="https://github.com/sedatzengin">
+<img src="https://avatars.githubusercontent.com/u/57956644?v=4" width="150px;" alt="Alperen Yasemin"/><br />
+<sub><b>Alperen Yasemin</b></sub><br />
+<sub>Data Analyst</sub><br />
+<a href="https://github.com/AlperenYasemin">
 <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
 </a>
 </td>
 <td align="center" width="33%">
-<img src="https://github.com/barisggun.png" width="150px;" alt="Contributor 3"/><br />
-<sub><b>Barış Güngör</b></sub><br />
-<sub>Developer</sub><br />
-<a href="https://github.com/barisggun">
+<img src="https://avatars.githubusercontent.com/u/170670866?v=4" width="150px;" alt="İshak Karataş"/><br />
+<sub><b>İshak Karataş</b></sub><br />
+<sub>Frontend Developer</sub><br />
+<a href="https://github.com/ishakkaratas05">
 <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
 </a>
 </td>
