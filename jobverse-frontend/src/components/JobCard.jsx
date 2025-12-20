@@ -6,28 +6,34 @@ import { useAuth } from '../context/AuthContext';
 const JobCard = ({ job }) => {
   const { isJobSaved, saveJob, removeJob } = useSavedJobs();
   const { isAuthenticated } = useAuth();
-  const saved = isJobSaved(job.id);
+
+  // MongoDB uses _id, fallback to id for compatibility
+  const jobId = job._id || job.id;
+  const saved = isJobSaved(jobId);
 
   const handleSaveToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       // Kullanıcı giriş yapmamışsa, login sayfasına yönlendir
       window.location.href = '/auth';
       return;
     }
 
+    // Save job with consistent id field
+    const jobToSave = { ...job, id: jobId };
+
     if (saved) {
-      removeJob(job.id);
+      removeJob(jobId);
     } else {
-      saveJob(job);
+      saveJob(jobToSave);
     }
   };
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] dark:shadow-[0_2px_10px_-3px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group relative">
-      
+
       {/* Minimal Kaydet Butonu */}
       {isAuthenticated && (
         <button
@@ -47,15 +53,15 @@ const JobCard = ({ job }) => {
           )}
         </button>
       )}
-      
+
       <div className="p-6 flex-grow">
         {/* Header: Firma & Tarih */}
         <div className="flex justify-between items-start mb-4 pr-10">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-               </svg>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
             </div>
             <span className="font-bold text-slate-700 dark:text-slate-200 text-sm transition-colors duration-200">
               {job.employerName || "Gizli Firma"}
@@ -67,8 +73,7 @@ const JobCard = ({ job }) => {
         </div>
 
         {/* --- BAŞLIK ARTIK LİNK OLDU --- */}
-        {/* Karta tıklandığında detay sayfasına yönlendirir */}
-        <Link to={`/jobs/${job.id}`} className="block group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <Link to={`/jobs/${jobId}`} className="block group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
           <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 leading-snug cursor-pointer transition-colors duration-200">
             {job.jobTitle}
           </h2>
@@ -119,9 +124,9 @@ const JobCard = ({ job }) => {
 
       {/* Buton */}
       <div className="p-6 pt-0 mt-auto">
-        <a 
-          href={job.jobApplyLink} 
-          target="_blank" 
+        <a
+          href={job.jobApplyLink}
+          target="_blank"
           rel="noreferrer"
           className="group flex items-center justify-center gap-2 w-full bg-slate-900 hover:bg-indigo-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300"
         >

@@ -1,23 +1,66 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { storage, db } from '../config/firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const CVUpload = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  
+
   const [cvFile, setCvFile] = useState(null);
   const [cvPreview, setCvPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [existingCV, setExistingCV] = useState(null);
+  const [isLoadingExisting, setIsLoadingExisting] = useState(true);
+
+  // Mevcut CV'yi yükle
+  useEffect(() => {
+    const loadExistingCV = async () => {
+      if (!user) {
+        setIsLoadingExisting(false);
+        return;
+      }
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          // cv objesi veya eski cvUrl alanını kontrol et
+          if (userData.cv?.url || userData.cvUrl) {
+            setExistingCV({
+              url: userData.cv?.url || userData.cvUrl,
+              fileName: userData.cv?.fileName || userData.cvFileName || 'CV.pdf',
+              uploadedAt: userData.cv?.uploadedAt || userData.cvUploadedAt || null,
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Mevcut CV yüklenirken hata:', err);
+      } finally {
+        setIsLoadingExisting(false);
+      }
+    };
+
+    loadExistingCV();
+  }, [user]);
 
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
         <div className="text-center">
-          <p className="text-slate-500 dark:text-slate-400 text-lg">Lütfen giriş yapın.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-lg mb-4">CV yüklemek için giriş yapmalısınız.</p>
+          <button
+            onClick={() => navigate('/auth')}
+            className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Giriş Yap
+          </button>
         </div>
       </div>
     );
@@ -41,7 +84,7 @@ const CVUpload = () => {
 
       setCvFile(file);
       setError(null);
-      
+
       // PDF önizleme için
       if (file.type === 'application/pdf') {
         const reader = new FileReader();
@@ -64,44 +107,149 @@ const CVUpload = () => {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
+    setUploadProgress(0);
 
     try {
-      // Mock API çağrısı - Backend entegrasyonu için hazır
-      // const formData = new FormData();
-      // formData.append('cv', cvFile);
-      // const response = await fetch('/api/cv/upload', {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: {
-      //     'Authorization': `Bearer ${token}`
-      //   }
-      // });
-      
-      // Şimdilik mock response
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSuccessMessage('CV başarıyla yüklendi.');
+      // Firebase Storage'a yükle
+      const fileExtension = cvFile.name.split('.').pop();
+      const fileName = `cv_${Date.now()}.${fileExtension}`;
+      const storageRef = ref(storage, `cvs/${user.uid}/${fileName}`);
+
+      const uploadTask = uploadBytesResumable(storageRef, cvFile);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (uploadError) => {
+          console.error('Upload error:', uploadError);
+          setError('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+          setIsLoading(false);
+        },
+        async () => {
+          // Yükleme tamamlandı, URL al
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          // Eski CV'yi sil (varsa)
+          if (existingCV?.url) {
+            try {
+              // URL'den path'i çıkar
+              const oldPath = existingCV.url.split('/o/')[1]?.split('?')[0];
+              if (oldPath) {
+                const decodedPath = decodeURIComponent(oldPath);
+                const oldRef = ref(storage, decodedPath);
+                await deleteObject(oldRef);
+              }
+            } catch (deleteErr) {
+              console.log('Eski CV silinirken hata (devam ediliyor):', deleteErr);
+            }
+          }
+
+          // Firestore'a kaydet (profileApi.js ile tutarlı cv objesi yapısı)
+          await updateDoc(doc(db, 'users', user.uid), {
+            cv: {
+              url: downloadURL,
+              fileName: cvFile.name,
+              uploadedAt: new Date().toISOString(),
+            },
+            updatedAt: new Date().toISOString(),
+          });
+
+          setExistingCV({
+            url: downloadURL,
+            fileName: cvFile.name,
+            uploadedAt: new Date().toISOString(),
+          });
+
+          setSuccessMessage('CV başarıyla yüklendi!');
+          setCvFile(null);
+          setCvPreview(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 5000);
+
+          setIsLoading(false);
+        }
+      );
+    } catch (err) {
+      console.error('CV yükleme hatası:', err);
+      setError(err.message || 'CV yüklenirken bir hata oluştu.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteExisting = async () => {
+    if (!existingCV || !window.confirm('Mevcut CV\'nizi silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Storage'dan sil
+      const oldPath = existingCV.url.split('/o/')[1]?.split('?')[0];
+      if (oldPath) {
+        const decodedPath = decodeURIComponent(oldPath);
+        const oldRef = ref(storage, decodedPath);
+        await deleteObject(oldRef);
+      }
+
+      // Firestore'dan kaldır
+      await updateDoc(doc(db, 'users', user.uid), {
+        cv: null,
+        updatedAt: new Date().toISOString(),
+      });
+
+      setExistingCV(null);
+      setSuccessMessage('CV başarıyla silindi.');
+
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
-      setError(err.message || 'CV yüklenirken bir hata oluştu.');
+      console.error('CV silme hatası:', err);
+      setError('CV silinirken bir hata oluştu.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = () => {
-    if (window.confirm('CV dosyasını silmek istediğinizden emin misiniz?')) {
-      setCvFile(null);
-      setCvPreview(null);
-      setError(null);
-      setSuccessMessage(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    setCvFile(null);
+    setCvPreview(null);
+    setError(null);
+    setSuccessMessage(null);
+    setUploadProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  if (isLoadingExisting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
@@ -113,7 +261,7 @@ const CVUpload = () => {
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors duration-200">CV Yükleme</h1>
           </div>
           <p className="text-sm text-slate-600 dark:text-slate-400 ml-4 transition-colors duration-200">
-            CV dosyanızı yükleyerek iş başvurularınızı kolaylaştırın
+            CV dosyanızı yükleyerek iş ilanlarıyla uyumluluğunuzu analiz edin
           </p>
         </div>
 
@@ -136,13 +284,56 @@ const CVUpload = () => {
           </div>
         )}
 
+        {/* Mevcut CV Kartı */}
+        {existingCV && (
+          <div className="mb-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200/60 dark:border-slate-700/60 overflow-hidden transition-colors duration-200">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900 dark:text-white transition-colors duration-200">Mevcut CV</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors duration-200">{existingCV.fileName}</p>
+                    {existingCV.uploadedAt && (
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                        Yüklenme: {formatDate(existingCV.uploadedAt)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={existingCV.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Görüntüle
+                  </a>
+                  <button
+                    onClick={handleDeleteExisting}
+                    disabled={isLoading}
+                    className="px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* CV Yükleme Kartı */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200/60 dark:border-slate-700/60 overflow-hidden transition-colors duration-200">
           <div className="p-8">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-2 transition-colors duration-200">
                 <div className="h-6 w-1 bg-sky-600 rounded-full"></div>
-                CV Dosyası Yükle
+                {existingCV ? 'CV Güncelle' : 'CV Dosyası Yükle'}
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 ml-3 transition-colors duration-200">
                 PDF, DOC veya DOCX formatında CV dosyanızı yükleyin (Maksimum 10MB)
@@ -152,8 +343,8 @@ const CVUpload = () => {
             {/* Dosya Seçme Alanı */}
             <div className="mb-6">
               <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-12 text-center cursor-pointer hover:border-sky-400 dark:hover:border-sky-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200"
+                onClick={() => !isLoading && fileInputRef.current?.click()}
+                className={`border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-12 text-center cursor-pointer hover:border-sky-400 dark:hover:border-sky-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {cvFile ? (
                   <div className="space-y-4">
@@ -210,6 +401,22 @@ const CVUpload = () => {
               />
             </div>
 
+            {/* Yükleme İlerleme Çubuğu */}
+            {isLoading && uploadProgress > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Yükleniyor...</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-sky-500 to-sky-600 h-3 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
             {/* PDF Önizleme */}
             {cvPreview && cvFile?.type === 'application/pdf' && (
               <div className="mb-6">
@@ -233,7 +440,8 @@ const CVUpload = () => {
                 <div className="text-sm text-sky-700 dark:text-sky-300">
                   <p className="font-semibold mb-1">CV Yükleme Hakkında</p>
                   <ul className="list-disc list-inside space-y-1 text-sky-600 dark:text-sky-400">
-                    <li>CV dosyanız güvenli bir şekilde saklanır</li>
+                    <li>CV dosyanız Firebase'de güvenli bir şekilde saklanır</li>
+                    <li>İş ilanlarıyla uyumluluğunuz otomatik analiz edilir</li>
                     <li>İstediğiniz zaman güncelleyebilir veya silebilirsiniz</li>
                   </ul>
                 </div>
@@ -253,9 +461,17 @@ const CVUpload = () => {
                 type="button"
                 onClick={handleUpload}
                 disabled={!cvFile || isLoading}
-                className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isLoading ? 'Yükleniyor...' : 'CV Yükle'}
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Yükleniyor...
+                  </>
+                ) : existingCV ? 'CV Güncelle' : 'CV Yükle'}
               </button>
             </div>
           </div>
@@ -266,4 +482,3 @@ const CVUpload = () => {
 };
 
 export default CVUpload;
-

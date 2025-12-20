@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { generateInterviewQuestions, analyzeInterviewAnswers } from '../services/geminiApi.js';
+import { generateInterviewQuestions, analyzeAnswer } from '../services/geminiApi.js';
 
 const InterviewSimulation = () => {
   const { user, isAuthenticated } = useAuth();
@@ -38,7 +38,7 @@ const InterviewSimulation = () => {
     }
 
     setIsLoading(true);
-    
+
     try {
       // Google Gemini AI ile soruları oluştur
       const generatedQuestions = await generateInterviewQuestions(selectedJob);
@@ -78,15 +78,15 @@ const InterviewSimulation = () => {
 
   const handleFinishInterview = async () => {
     setIsLoading(true);
-    
+
     try {
       // Google Gemini AI ile cevapları analiz et
-      const analysis = await analyzeInterviewAnswers(selectedJob, answers);
+      const analysis = await analyzeAnswer(selectedJob, answers);
       setAnalysisResult(analysis);
-      
+
       // Analiz sonuçlarını göster (yakında detaylı bir sonuç sayfası eklenebilir)
       alert(`Mülakat simülasyonu tamamlandı!\n\nGenel Puan: ${analysis.overallScore}/100\n\n${analysis.feedback}`);
-      
+
       // Şimdilik simülasyonu bitir, ileride analiz sonuç sayfası eklenebilir
       // setInterviewStarted(false);
     } catch (error) {
@@ -130,11 +130,10 @@ const InterviewSimulation = () => {
                   <button
                     key={job.id}
                     onClick={() => setSelectedJob(job)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                      selectedJob?.id === job.id
-                        ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600 bg-white dark:bg-slate-700'
-                    }`}
+                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${selectedJob?.id === job.id
+                      ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600 bg-white dark:bg-slate-700'
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
@@ -214,7 +213,7 @@ const InterviewSimulation = () => {
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 transition-colors duration-200">
                   {questions[currentQuestion]}
                 </h2>
-                
+
                 <textarea
                   value={answers[currentQuestion]?.answer || ''}
                   onChange={(e) => handleAnswerChange(e.target.value)}
@@ -233,7 +232,7 @@ const InterviewSimulation = () => {
                 >
                   ← Önceki
                 </button>
-                
+
                 <div className="flex gap-3">
                   {questions.length > 0 && currentQuestion === questions.length - 1 ? (
                     <button

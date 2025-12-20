@@ -1,89 +1,111 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { auth, db } from '../config/firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-// Context nesnesi
 const AuthContext = createContext(null);
 
-// localStorage'da kullanacağımız key
-const STORAGE_KEY = 'authUser';
-
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Uygulama ilk açıldığında localStorage'dan kullanıcıyı oku
-  useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem(STORAGE_KEY);
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (err) {
-      console.error('AuthContext localStorage okuma hatası:', err);
-    } finally {
-      setIsLoading(false);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
     }
-  }, []);
+    return context;
+};
 
-  // Mock login fonksiyonu
-  const login = async (email, password) => {
-    setError(null);
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Backend henüz olmadığı için setTimeout ile küçük bir gecikme simüle edelim
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+                    const userData = userDoc.exists() ? userDoc.data() : {};
 
-    if (email === 'test@mail.com' && password === '123') {
-      const loggedInUser = {
-        id: 1,
-        name: 'Test Deneme',
-        email: 'test@mail.com',
-      };
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName || userData.displayName || '',
+                        photoURL: firebaseUser.photoURL || userData.photoURL || '',
+                        ...userData
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName || '',
+                        photoURL: firebaseUser.photoURL || ''
+                    });
+                }
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
 
-      setUser(loggedInUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedInUser));
-      return { success: true, user: loggedInUser };
-    } else {
-      const errMsg = 'Email veya şifre hatalı.';
-      setError(errMsg);
-      return { success: false, error: errMsg };
-    }
-  };
+        return () => unsubscribe();
+    }, []);
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+    const login = async (email, password) => {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        return result.user;
+    };
 
-  // Google OAuth ile giriş (backend'den dönen user ve token ile)
-  const loginWithGoogle = (userData, token) => {
-    setError(null);
-    setUser(userData);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    // Token'ı da ayrı bir yerde saklayabilirsiniz: localStorage.setItem('authToken', token);
-    return { success: true, user: userData };
-  };
+    const register = async (email, password, displayName) => {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
 
-  const value = {
-    user,
-    setUser,
-    isAuthenticated: !!user,
-    isLoading,
-    error,
-    login,
-    logout,
-    loginWithGoogle,
-  };
+        if (displayName) {
+            await updateProfile(result.user, { displayName });
+        }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+        await setDoc(doc(db, 'users', result.user.uid), {
+            email,
+            displayName: displayName || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
 
-// Context'i kullanmak için custom hook
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth, AuthProvider içinde kullanılmalıdır.');
-  }
-  return ctx;
-}
+        return result.user;
+    };
 
+    const loginWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
 
+        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+        if (!userDoc.exists()) {
+            await setDoc(doc(db, 'users', result.user.uid), {
+                email: result.user.email,
+                displayName: result.user.displayName || '',
+                photoURL: result.user.photoURL || '',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+        }
+
+        return result.user;
+    };
+
+    const logout = async () => {
+        await signOut(auth);
+    };
+
+    const value = {
+        user,
+        loading,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        isAuthenticated: !!user
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
+};

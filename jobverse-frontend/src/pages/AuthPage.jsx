@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { authApi } from '../services/authApi.js';
 import logo from '../assets/images/logo3.png';
 
 const AuthPage = () => {
-  const { login, loginWithGoogle, error, isLoading } = useAuth();
+  const { login, register, loginWithGoogle, error, isLoading } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState('signIn'); // 'signIn' | 'signUp'
 
@@ -30,17 +29,12 @@ const AuthPage = () => {
     setLocalError(null);
 
     try {
-      // Backend'den Google OAuth sonucu alınır
-      // Şimdilik mock, backend hazır olunca gerçek API çağrısı yapılacak
-      const result = await authApi.googleLogin(mode);
-      
-      // Backend'den dönen user ve token'i AuthContext'e kaydet
-      const loginResult = loginWithGoogle(result.user, result.token);
-      
-      if (loginResult.success) {
+      const result = await loginWithGoogle();
+
+      if (result.success) {
         navigate('/');
       } else {
-        setLocalError('Google ile giriş yapılamadı.');
+        setLocalError(result.error || 'Google ile giriş yapılamadı.');
       }
     } catch (error) {
       setLocalError(error.message || 'Google ile giriş yapılırken bir hata oluştu.');
@@ -62,12 +56,11 @@ const AuthPage = () => {
     navigate('/');
   };
 
-  // Backend henüz olmadığı için sign up da mock login kullanıyor
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     setLocalError(null);
 
-    const result = await login(signUpForm.email, signUpForm.password);
+    const result = await register(signUpForm.name, signUpForm.email, signUpForm.password);
     if (!result.success) {
       setLocalError(result.error);
       return;
@@ -75,6 +68,7 @@ const AuthPage = () => {
 
     navigate('/');
   };
+
 
   const formVariants = {
     initial: (direction) => ({
@@ -115,9 +109,8 @@ const AuthPage = () => {
 
       <motion.div
         layout
-        className={`relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-3xl shadow-[0_25px_60px_rgba(15,23,42,0.25)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row transition-colors duration-200 ${
-          mode === 'signUp' ? 'md:flex-row-reverse' : ''
-        }`}
+        className={`relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-3xl shadow-[0_25px_60px_rgba(15,23,42,0.25)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row transition-colors duration-200 ${mode === 'signUp' ? 'md:flex-row-reverse' : ''
+          }`}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{

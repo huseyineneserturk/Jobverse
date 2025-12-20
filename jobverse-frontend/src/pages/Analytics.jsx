@@ -56,7 +56,7 @@ const Analytics = () => {
               <div className="w-40 text-sm text-slate-700 dark:text-slate-300 truncate transition-colors duration-200">
                 {item[labelKey]} {formatLabel && `(${label})`}
               </div>
-              <div className="flex-1 bg-slate-200 rounded-full h-6 overflow-hidden">
+              <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-full h-6 overflow-hidden">
                 <div
                   className={`${color} h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2`}
                   style={{ width: `${percentage}%` }}
@@ -81,7 +81,7 @@ const Analytics = () => {
           return (
             <div key={index} className="flex items-center gap-3">
               <div className="w-32 text-sm text-slate-700 dark:text-slate-300 transition-colors duration-200">{item.skill}</div>
-              <div className="flex-1 bg-slate-200 rounded-full h-6 overflow-hidden">
+              <div className="flex-1 bg-slate-200 dark:bg-slate-600 rounded-full h-6 overflow-hidden">
                 <div
                   className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
                   style={{ width: `${percentage}%` }}
@@ -111,24 +111,24 @@ const Analytics = () => {
       const angle = (percentage / 100) * 360;
       const startAngle = currentAngle;
       const endAngle = currentAngle + angle;
-      
+
       const x1 = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
       const y1 = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
       const x2 = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
       const y2 = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
-      
+
       const largeArcFlag = angle > 180 ? 1 : 0;
-      
+
       const pathData = [
         `M ${centerX} ${centerY}`,
         `L ${x1} ${y1}`,
         `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
         'Z'
       ].join(' ');
-      
+
       const color = item.is_remote ? '#10b981' : '#3b82f6';
       currentAngle = endAngle;
-      
+
       return { pathData, color };
     });
 
@@ -191,11 +191,10 @@ const Analytics = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
-                activeTab === tab.id
+              className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === tab.id
                   ? 'bg-[#0f172a] dark:bg-sky-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -315,19 +314,19 @@ const Analytics = () => {
                   <p className="text-2xl font-bold text-slate-800 dark:text-white transition-colors duration-200">
                     {formatCurrency(
                       maasOranlari.reduce((sum, item) => sum + item.avg_salary, 0) /
-                        maasOranlari.length
+                      maasOranlari.length
                     )}
                   </p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-4">
+                <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 transition-colors duration-200">
                   <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 transition-colors duration-200">Minimum Maaş</p>
-                  <p className="text-2xl font-bold text-slate-800">
+                  <p className="text-2xl font-bold text-slate-800 dark:text-white transition-colors duration-200">
                     {formatCurrency(Math.min(...maasOranlari.map(item => item.job_min_salary)))}
                   </p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-4">
-                  <p className="text-sm text-slate-600 mb-1">Maksimum Maaş</p>
-                  <p className="text-2xl font-bold text-slate-800">
+                <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 transition-colors duration-200">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 transition-colors duration-200">Maksimum Maaş</p>
+                  <p className="text-2xl font-bold text-slate-800 dark:text-white transition-colors duration-200">
                     {formatCurrency(Math.max(...maasOranlari.map(item => item.job_max_salary)))}
                   </p>
                 </div>

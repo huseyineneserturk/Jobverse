@@ -1,163 +1,195 @@
-// src/services/authApi.js
-// Backend entegrasyonuna hazırlık için mock auth servisleri.
-// Buradaki fonksiyonlar ileride gerçek fetch/axios istekleriyle kolayca değiştirilebilir.
+// Authentication API using Firebase
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, googleProvider, db } from '../config/firebase';
 
-// Örn: ileride burayı .env'den alabilirsiniz
-const API_BASE_URL = import.meta?.env?.VITE_API_URL || 'http://localhost:3000/api';
+// Backend API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-// Tüm istekler için kullanılacak yapay gecikme (ms)
-const API_DELAY = 1000;
+/**
+ * Login with email and password
+ */
+export async function login({ email, password }) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    const token = await user.getIdToken();
 
-// Ortak mock request wrapper
-function mockRequest(executor) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        const result = executor();
-        resolve(result);
-      } catch (error) {
-        reject(error);
+    // Get user profile from Firestore
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : {};
+
+    return {
+      success: true,
+      data: {
+        user: {
+          id: user.uid,
+          email: user.email,
+          name: userData.name || user.displayName || '',
+          profilePhoto: userData.profilePhotoURL || user.photoURL || '',
+          ...userData
+        },
+        token
       }
-    }, API_DELAY);
-  });
+    };
+  } catch (error) {
+    console.error('Login error:', error);
+    return {
+      success: false,
+      error: getErrorMessage(error.code)
+    };
+  }
 }
 
 /**
- * Kullanıcı girişi
- * @param {{ email: string, password: string }} payload
- * @returns {Promise<{ user: any, token: string }>}
+ * Register new user with email and password
  */
-export function login(payload) {
-  // İLERİDE:
-  // return fetch(`${API_BASE_URL}/auth/login`, { ... })
-  //   .then((res) => res.json());
+export async function register({ name, email, password }) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  const { email, password } = payload;
+    // Update Firebase Auth profile
+    await updateProfile(user, { displayName: name });
 
-  return mockRequest(() => {
-    if (email === 'test@mail.com' && password === '123') {
-      const user = {
-        id: 1,
-        name: 'Test Kullanıcı',
-        email: 'test@mail.com',
-      };
-
-      const token = 'mock-jwt-token';
-
-      return { user, token };
-    }
-
-    const error = new Error('Email veya şifre hatalı.');
-    error.status = 401;
-    throw error;
-  });
-}
-
-/**
- * Kayıt olma
- * @param {{ name: string, email: string, password: string }} payload
- * @returns {Promise<{ user: any, token: string }>}
- */
-export function register(payload) {
-  // İLERİDE:
-  // return fetch(`${API_BASE_URL}/auth/register`, { ... })
-  //   .then((res) => res.json());
-
-  const { name, email, password } = payload;
-
-  return mockRequest(() => {
-    if (!name || !email || !password) {
-      const error = new Error('Lütfen tüm alanları doldurun.');
-      error.status = 400;
-      throw error;
-    }
-
-    const user = {
-      id: Date.now(),
+    // Create user document in Firestore
+    await setDoc(doc(db, 'users', user.uid), {
       name,
       email,
+      createdAt: new Date().toISOString(),
+      savedJobs: []
+    });
+
+    const token = await user.getIdToken();
+
+    return {
+      success: true,
+      data: {
+        user: {
+          id: user.uid,
+          email: user.email,
+          name: name
+        },
+        token
+      }
     };
+  } catch (error) {
+    console.error('Register error:', error);
+    return {
+      success: false,
+      error: getErrorMessage(error.code)
+    };
+  }
+}
 
-    const token = 'mock-jwt-token';
+/**
+ * Login with Google
+ */
+export async function googleLogin() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    const token = await user.getIdToken();
 
-    return { user, token };
+    // Check if user document exists, if not create it
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        name: user.displayName || '',
+        email: user.email,
+        profilePhotoURL: user.photoURL || '',
+        createdAt: new Date().toISOString(),
+        savedJobs: []
+      });
+    }
+
+    const userData = userDoc.exists() ? userDoc.data() : {};
+
+    return {
+      success: true,
+      data: {
+        user: {
+          id: user.uid,
+          email: user.email,
+          name: user.displayName || userData.name || '',
+          profilePhoto: user.photoURL || userData.profilePhotoURL || '',
+          ...userData
+        },
+        token
+      }
+    };
+  } catch (error) {
+    console.error('Google login error:', error);
+    return {
+      success: false,
+      error: getErrorMessage(error.code)
+    };
+  }
+}
+
+/**
+ * Logout current user
+ */
+export async function logout() {
+  try {
+    await signOut(auth);
+    return { success: true };
+  } catch (error) {
+    console.error('Logout error:', error);
+    return {
+      success: false,
+      error: 'Çıkış yapılırken bir hata oluştu'
+    };
+  }
+}
+
+/**
+ * Get current user token for API requests
+ */
+export async function getAuthToken() {
+  const user = auth.currentUser;
+  if (!user) return null;
+  return await user.getIdToken();
+}
+
+/**
+ * Helper function to make authenticated API requests
+ */
+export async function authenticatedFetch(url, options = {}) {
+  const token = await getAuthToken();
+
+  return fetch(`${API_BASE_URL}${url}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...options.headers
+    }
   });
 }
 
 /**
- * Çıkış yapma
- * @returns {Promise<{ success: boolean }>}
+ * Convert Firebase error codes to Turkish messages
  */
-export function logout() {
-  // İLERİDE:
-  // return fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' })
-  //   .then((res) => res.json());
+function getErrorMessage(code) {
+  const messages = {
+    'auth/user-not-found': 'Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı',
+    'auth/wrong-password': 'Hatalı şifre',
+    'auth/email-already-in-use': 'Bu e-posta adresi zaten kullanılıyor',
+    'auth/weak-password': 'Şifre en az 6 karakter olmalıdır',
+    'auth/invalid-email': 'Geçersiz e-posta adresi',
+    'auth/too-many-requests': 'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin',
+    'auth/popup-closed-by-user': 'Giriş işlemi iptal edildi',
+    'auth/invalid-credential': 'E-posta veya şifre hatalı'
+  };
 
-  return mockRequest(() => ({ success: true }));
+  return messages[code] || 'Bir hata oluştu. Lütfen tekrar deneyin.';
 }
-
-/**
- * Google ile giriş/kayıt
- * Backend'den OAuth URL'i alır veya direkt OAuth popup'ı açar
- * @param {string} mode - 'signin' | 'signup' (opsiyonel, backend'e gönderilebilir)
- * @returns {Promise<{ user: any, token: string }>}
- */
-export function googleLogin(mode = 'signin') {
-  // İLERİDE BACKEND ENTEGRASYONU İÇİN:
-  // 
-  // Yöntem 1: Backend'den OAuth URL alıp redirect
-  // return fetch(`${API_BASE_URL}/auth/google/url?mode=${mode}`, { method: 'GET' })
-  //   .then((res) => res.json())
-  //   .then((data) => {
-  //     window.location.href = data.authUrl; // Backend'den gelen Google OAuth URL'i
-  //   });
-  //
-  // Yöntem 2: Popup ile OAuth (daha modern)
-  // const popup = window.open(
-  //   `${API_BASE_URL}/auth/google/popup?mode=${mode}`,
-  //   'google-auth',
-  //   'width=500,height=600'
-  // );
-  // return new Promise((resolve, reject) => {
-  //   const checkPopup = setInterval(() => {
-  //     if (popup.closed) {
-  //       clearInterval(checkPopup);
-  //       // OAuth callback'den token al
-  //       const token = localStorage.getItem('google_token');
-  //       if (token) {
-  //         resolve({ user: JSON.parse(localStorage.getItem('google_user')), token });
-  //       } else {
-  //         reject(new Error('Google girişi iptal edildi.'));
-  //       }
-  //     }
-  //   }, 500);
-  // });
-  //
-  // Yöntem 3: Backend callback URL'i ile (en yaygın)
-  // Backend'den gelen URL'e yönlendir, callback'te token döner
-  // window.location.href = `${API_BASE_URL}/auth/google?redirect=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
-
-  // ŞİMDİLİK MOCK: Backend hazır olunca yukarıdaki yöntemlerden birini kullan
-  return mockRequest(() => {
-    // Mock Google kullanıcısı
-    const user = {
-      id: Date.now(),
-      name: 'Google Kullanıcı',
-      email: 'google.user@example.com',
-      provider: 'google',
-    };
-
-    const token = 'mock-google-jwt-token';
-
-    return { user, token };
-  });
-}
-
-export const authApi = {
-  login,
-  register,
-  logout,
-  googleLogin,
-};
-
-

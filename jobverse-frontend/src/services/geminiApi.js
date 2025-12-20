@@ -1,182 +1,132 @@
-/**
- * Google Gemini AI API Service
- * 
- * Kullanım:
- * 1. .env dosyasına GEMINI_API_KEY=your_api_key ekleyin
- * 2. API key'i https://aistudio.google.com/app/apikey adresinden alabilirsiniz
- * 3. Bu servis, mülakat simülasyonu için Gemini AI ile entegrasyon sağlar
- */
+// Gemini AI API Service - uses backend proxy for security
+import { authenticatedFetch } from './authApi';
 
-// API Key - Environment variable'dan alınacak
-// .env dosyasına şunu ekleyin: VITE_GEMINI_API_KEY=your_api_key_here
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 /**
- * Gemini AI ile mülakat soruları oluştur
- * @param {Object} jobData - İş ilanı bilgileri (title, company, description, etc.)
- * @returns {Promise<Array>} - Mülakat soruları dizisi
+ * Generate interview questions based on job data
  */
-export const generateInterviewQuestions = async (jobData) => {
-  if (!GEMINI_API_KEY) {
-    console.warn('GEMINI_API_KEY bulunamadı. Mock sorular kullanılacak.');
-    // Mock sorular döndür (backend hazır olana kadar)
-    return getMockQuestions();
-  }
-
-  try {
-    const prompt = `
-      Aşağıdaki iş ilanı için profesyonel mülakat soruları oluştur.
-      İş İlanı Başlığı: ${jobData.title || 'Yazılım Geliştirici'}
-      Şirket: ${jobData.company || 'Teknoloji Şirketi'}
-      Açıklama: ${jobData.description || ''}
-      
-      Lütfen 5-7 adet mülakat sorusu oluştur. Sorular teknik ve davranışsal soruları içermeli.
-      Sadece soruları listeleyin, numaralandırmadan.
-    `;
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const questionsText = data.candidates[0].content.parts[0].text;
-    
-    // Metni sorulara böl
-    const questions = questionsText
-      .split('\n')
-      .filter(line => line.trim() && line.trim().length > 10)
-      .map(line => line.replace(/^\d+[\.\)]\s*/, '').trim())
-      .slice(0, 7);
-
-    return questions.length > 0 ? questions : getMockQuestions();
-  } catch (error) {
-    console.error('Gemini API error:', error);
-    // Hata durumunda mock sorular döndür
-    return getMockQuestions();
-  }
-};
-
-/**
- * Gemini AI ile cevap analizi yap
- * @param {Object} jobData - İş ilanı bilgileri
- * @param {Array} answers - Kullanıcının verdiği cevaplar
- * @returns {Promise<Object>} - Analiz sonuçları (score, feedback, suggestions)
- */
-export const analyzeInterviewAnswers = async (jobData, answers) => {
-  if (!GEMINI_API_KEY) {
-    console.warn('GEMINI_API_KEY bulunamadı. Mock analiz döndürülecek.');
-    return getMockAnalysis();
-  }
-
-  try {
-    const prompt = `
-      Aşağıdaki iş ilanı için verilen mülakat cevaplarını analiz et ve geri bildirim sağla.
-      
-      İş İlanı: ${jobData.title || 'Yazılım Geliştirici'}
-      Şirket: ${jobData.company || 'Teknoloji Şirketi'}
-      
-      Sorular ve Cevaplar:
-      ${answers.map((answer, index) => `
-        Soru ${index + 1}: ${answer.question || ''}
-        Cevap: ${answer.answer || ''}
-      `).join('\n')}
-      
-      Lütfen şu formatta JSON döndür:
-      {
-        "overallScore": 0-100 arası sayı,
-        "feedback": "Genel geri bildirim metni",
-        "suggestions": ["Öneri 1", "Öneri 2", "Öneri 3"],
-        "questionFeedback": [
-          {
-            "questionNumber": 1,
-            "score": 0-100,
-            "feedback": "Bu soru için geri bildirim"
-          }
-        ]
-      }
-    `;
-
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const analysisText = data.candidates[0].content.parts[0].text;
-    
-    // JSON'u parse et
+export async function generateInterviewQuestions(jobData) {
     try {
-      const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
+        const response = await authenticatedFetch('/ai/interview-questions', {
+            method: 'POST',
+            body: JSON.stringify({ jobData })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            return data.data;
+        }
+
+        return getMockQuestions();
+    } catch (error) {
+        console.error('generateInterviewQuestions error:', error);
+        return getMockQuestions();
     }
-
-    return getMockAnalysis();
-  } catch (error) {
-    console.error('Gemini API error:', error);
-    return getMockAnalysis();
-  }
-};
+}
 
 /**
- * Mock sorular (API key yoksa veya hata durumunda)
+ * Analyze interview answers
  */
-const getMockQuestions = () => {
-  return [
-    "Kendinizi kısaca tanıtır mısınız?",
-    "Bu pozisyon için neden uygun olduğunuzu düşünüyorsunuz?",
-    "En güçlü teknik yetenekleriniz nelerdir?",
-    "Zor bir projede nasıl problem çözüyorsunuz?",
-    "Takım çalışması konusundaki deneyimleriniz nelerdir?",
-    "Son projelerinizden birini detaylı olarak anlatır mısınız?",
-    "Kariyer hedefleriniz nelerdir?"
-  ];
-};
+export async function analyzeAnswer(jobData, answers) {
+    try {
+        const response = await authenticatedFetch('/ai/analyze-answers', {
+            method: 'POST',
+            body: JSON.stringify({ jobData, answers })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            return data.data;
+        }
+
+        return getMockAnalysis();
+    } catch (error) {
+        console.error('analyzeAnswer error:', error);
+        return getMockAnalysis();
+    }
+}
 
 /**
- * Mock analiz (API key yoksa veya hata durumunda)
+ * Chat with AI assistant
  */
-const getMockAnalysis = () => {
-  return {
-    overallScore: 75,
-    feedback: "Cevaplarınız genel olarak iyi. Bazı alanlarda daha detaylı açıklamalar yapabilirsiniz.",
-    suggestions: [
-      "Teknik yeteneklerinizi daha somut örneklerle destekleyin",
-      "Takım çalışması deneyimlerinizi detaylandırın",
-      "Proje örneklerinizde ölçülebilir sonuçlar belirtin"
-    ],
-    questionFeedback: []
-  };
-};
+export async function chatWithAI(message, context = null) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, context })
+        });
 
+        const data = await response.json();
+
+        if (data.success) {
+            return data.data.response;
+        }
+
+        return 'Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.';
+    } catch (error) {
+        console.error('chatWithAI error:', error);
+        return 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+    }
+}
+
+/**
+ * Calculate job match score
+ */
+export async function calculateJobMatch(userProfile, jobData) {
+    try {
+        const response = await authenticatedFetch('/ai/job-match', {
+            method: 'POST',
+            body: JSON.stringify({ userProfile, jobData })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            return data.data;
+        }
+
+        return getMockJobMatch();
+    } catch (error) {
+        console.error('calculateJobMatch error:', error);
+        return getMockJobMatch();
+    }
+}
+
+// Mock data for fallback
+function getMockQuestions() {
+    return [
+        'Kendinizi kısaca tanıtır mısınız?',
+        'Bu pozisyon için neden uygun olduğunuzu düşünüyorsunuz?',
+        'En güçlü teknik yetenekleriniz nelerdir?',
+        'Zor bir projede nasıl problem çözüyorsunuz?',
+        'Takım çalışması konusundaki deneyimleriniz nelerdir?',
+        'Son projelerinizden birini detaylı olarak anlatır mısınız?',
+        'Kariyer hedefleriniz nelerdir?',
+    ];
+}
+
+function getMockAnalysis() {
+    return {
+        overallScore: 75,
+        feedback: 'Cevaplarınız genel olarak iyi. Bazı alanlarda daha detaylı açıklamalar yapabilirsiniz.',
+        suggestions: [
+            'Teknik yeteneklerinizi daha somut örneklerle destekleyin',
+            'Takım çalışması deneyimlerinizi detaylandırın',
+            'Proje örneklerinizde ölçülebilir sonuçlar belirtin',
+        ],
+    };
+}
+
+function getMockJobMatch() {
+    return {
+        matchScore: 72,
+        matchedSkills: ['JavaScript', 'React', 'Problem çözme'],
+        missingSkills: ['TypeScript', 'AWS'],
+        summary: 'Profiliniz bu pozisyon için uygun görünüyor.',
+        recommendations: ['TypeScript öğrenmeyi düşünün', 'Bulut teknolojileri deneyimi ekleyin'],
+    };
+}

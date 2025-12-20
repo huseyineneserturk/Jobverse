@@ -191,24 +191,71 @@ Jobverse, iş piyasasındaki güncel trendleri analiz eden, beceri taleplerini h
 
 ### Gereksinimler
 
-- Python 3.8+
+- Node.js 18+
+- MongoDB Atlas hesabı
+- Firebase projesi
+- Gemini API Key
 
 ### Backend Kurulumu
 
 ```bash
+# Backend klasörüne git
+cd jobverse-backend
 
+# Bağımlılıkları yükle
+npm install
+
+# .env dosyasını oluştur
+cp .env.example .env
+# .env dosyasını düzenle ve gerekli değerleri gir
+
+# Development modunda çalıştır
+npm run dev
+
+# Production build
+npm run build
 ```
 
 ### Frontend Kurulumu
 
 ```bash
+# Frontend klasörüne git
+cd jobverse-frontend
 
+# Bağımlılıkları yükle
+npm install
+
+# .env dosyasını oluştur
+cp .env.example .env
+# API URL'ini ayarla
+
+# Development modunda çalıştır
+npm run dev
+
+# Production build
+npm run build
 ```
 
-### Docker ile Kurulum
+### 🌐 Digital Ocean Deploy
 
 ```bash
+# Sunucuya SSH ile bağlan
+ssh root@YOUR_SERVER_IP
 
+# Repo'yu klonla
+git clone https://github.com/huseyineneserturk/Jobverse.git
+cd Jobverse
+
+# Deploy scriptini çalıştır
+chmod +x deploy.sh
+./deploy.sh
+```
+
+**DNS Ayarları (jobverse.tech):**
+```
+A Record: @ → Server IP
+A Record: www → Server IP
+A Record: api → Server IP
 ```
 
 ---
