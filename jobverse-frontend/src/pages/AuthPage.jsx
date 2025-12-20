@@ -187,11 +187,7 @@ const AuthPage = () => {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 transition-colors duration-200">
-                    <span>
-                      Test için: <span className="font-mono">test@mail.com</span> /{' '}
-                      <span className="font-mono">123</span>
-                    </span>
+                  <div className="flex items-center justify-end text-xs">
                     <button
                       type="button"
                       className="text-sky-600 hover:underline"
@@ -324,7 +320,7 @@ const AuthPage = () => {
                         }))
                       }
                       className="w-full rounded-md border border-slate-200 dark:border-slate-600 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors duration-200"
-                      placeholder="En az 3 karakter (mock: 123)"
+                      placeholder="En az 6 karakter"
                     />
                   </div>
 
