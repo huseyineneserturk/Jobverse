@@ -207,8 +207,8 @@ const Analytics = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === tab.id
-                  ? 'bg-[#0f172a] dark:bg-sky-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                ? 'bg-[#0f172a] dark:bg-sky-600 text-white'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
             >
               {tab.label}
@@ -230,7 +230,7 @@ const Analytics = () => {
                 <p className="text-3xl font-bold">{chartData.remoteStats?.remote_count?.toLocaleString() || 0}</p>
               </div>
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
-                <p className="text-purple-100 text-sm">Ortalama Maaş</p>
+                <p className="text-purple-100 text-sm">Medyan Maaş</p>
                 <p className="text-3xl font-bold">{formatCurrency(chartData.salaryStats?.avg_salary || 0)}</p>
               </div>
               <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-5 text-white shadow-lg">
@@ -377,19 +377,19 @@ const Analytics = () => {
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Maaş İstatistikleri</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Ortalama Maaş</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Medyan Maaş</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">
                     {formatCurrency(chartData.salaryStats?.avg_salary || 0)}
                   </p>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Minimum Maaş</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Yıllık Minimum Maaş</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">
                     {formatCurrency(chartData.salaryStats?.min_salary || 0)}
                   </p>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Maksimum Maaş</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">YıllıkMaksimum Maaş</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">
                     {formatCurrency(chartData.salaryStats?.max_salary || 0)}
                   </p>
