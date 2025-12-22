@@ -5,6 +5,7 @@ export interface IJob extends Document {
     id: number;
     job_title: string;
     employer_name: string;
+    employer_logo: string | null;
     job_publisher: string;
     job_employment_type: string;
     job_apply_link: string;
@@ -37,6 +38,7 @@ export const transformJobForFrontend = (job: any) => {
         id: job.id,
         jobTitle: job.job_title,
         employerName: job.employer_name,
+        employerLogo: job.employer_logo || null,
         jobPublisher: job.job_publisher,
         jobEmploymentType: job.job_employment_type,
         jobApplyLink: job.job_apply_link,
@@ -62,6 +64,7 @@ const JobSchema: Schema = new Schema({
     id: { type: Number, required: true },
     job_title: { type: String, required: true },
     employer_name: { type: String },
+    employer_logo: { type: String },
     job_publisher: { type: String },
     job_employment_type: { type: String },
     job_apply_link: { type: String },
