@@ -48,8 +48,10 @@ const Profile = () => {
         phone: user.phone || '',
         bio: user.bio || '',
       });
-      if (user.profileImage) {
-        setProfileImagePreview(user.profileImage);
+      if (user.profilePhotoURL) {
+        setProfileImagePreview(user.profilePhotoURL);
+      } else if (user.photoURL) {
+        setProfileImagePreview(user.photoURL);
       }
       // Eğitim bilgilerini yükle
       if (user.education) {
@@ -107,7 +109,7 @@ const Profile = () => {
       }
 
       // Backend'den dönen imageUrl'i user'a kaydet
-      const updatedUser = { ...user, profileImage: result.data?.imageUrl };
+      const updatedUser = { ...user, profilePhotoURL: result.data?.imageUrl };
       setUser(updatedUser);
 
       setProfileImage(null);

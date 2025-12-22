@@ -46,6 +46,14 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
             return;
         }
 
+        // DEBUG: MongoDB'deki gerçek veri yapısını logla
+        console.log('=== DEBUG: 1_top_titles sample ===');
+        console.log(JSON.stringify(latestInsight['1_top_titles']?.slice(0, 2), null, 2));
+        console.log('=== DEBUG: 2_top_cities sample ===');
+        console.log(JSON.stringify(latestInsight['2_top_cities']?.slice(0, 2), null, 2));
+        console.log('=== DEBUG: 10_posting_days sample ===');
+        console.log(JSON.stringify(latestInsight['10_posting_days']?.slice(0, 2), null, 2));
+
         // Transform skills object to array format
         const topSkillsArray = latestInsight['7_top_skills']
             ? Object.entries(latestInsight['7_top_skills'] as Record<string, number>)
