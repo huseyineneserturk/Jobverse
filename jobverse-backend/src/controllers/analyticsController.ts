@@ -68,6 +68,7 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
             : [];
 
         // Transform remote stats to proper format
+        // Python: df['job_is_remote'].value_counts().reset_index().rename(columns={'index': 'is_remote', 'job_is_remote': 'count'})
         const remoteStats = latestInsight['3_remote_stats'];
         let remoteData = { remote_count: 0, office_count: 0 };
         if (Array.isArray(remoteStats)) {
@@ -83,7 +84,7 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
         // Transform salary stats
         const salaryStats = latestInsight['5_salary_stats'];
         let salaryData = { avg_salary: 0, min_salary: 0, max_salary: 0 };
-        if (salaryStats && typeof salaryStats === 'object') {
+        if (salaryStats && typeof salaryStats === 'object' && typeof salaryStats !== 'string') {
             salaryData = {
                 avg_salary: (salaryStats as any).mean_avg || 0,
                 min_salary: (salaryStats as any).min_avg || 0,
@@ -91,42 +92,67 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
             };
         }
 
-        // Transform top titles - fix field names
+        // Transform top titles - Python uses: rename(columns={'index': 'job_title', 'job_title': 'count'})
+        // So the field is 'job_title' not 'title'
         const topTitles = Array.isArray(latestInsight['1_top_titles'])
             ? latestInsight['1_top_titles'].map((item: any) => ({
-                title: item.job_title || item.title || 'Bilinmiyor',
+                title: item.job_title || item.index || '',
                 count: item.count || 0
             }))
             : [];
 
-        // Transform top cities - fix field names
+        // Transform top cities - Python: rename(columns={'index': 'city', 'job_city': 'count'})
         const topCities = Array.isArray(latestInsight['2_top_cities'])
             ? latestInsight['2_top_cities'].map((item: any) => ({
-                city: item.city || item.job_city || 'Bilinmiyor',
+                city: item.city || item.index || '',
                 count: item.count || 0
             }))
             : [];
 
-        // Transform top states - fix field names
+        // Transform top states - Python: rename(columns={'index': 'state', 'job_state': 'count'})
         const topStates = Array.isArray(latestInsight['8_top_states'])
             ? latestInsight['8_top_states'].map((item: any) => ({
-                state: item.state || item.job_state || 'Bilinmiyor',
+                state: item.state || item.index || '',
                 count: item.count || 0
             }))
             : [];
 
-        // Transform posting days
+        // Transform top employers - Python: rename(columns={'index': 'employer', 'employer_name': 'count'})
+        const topEmployers = Array.isArray(latestInsight['4_top_employers'])
+            ? latestInsight['4_top_employers'].map((item: any) => ({
+                employer: item.employer || item.index || '',
+                count: item.count || 0
+            }))
+            : [];
+
+        // Transform publishers - Python: rename(columns={'index': 'publisher', 'job_publisher': 'count'})
+        const publishers = Array.isArray(latestInsight['6_publishers'])
+            ? latestInsight['6_publishers'].map((item: any) => ({
+                publisher: item.publisher || item.index || '',
+                count: item.count || 0
+            }))
+            : [];
+
+        // Transform posting days - Python: rename(columns={'index': 'day', 'day_name': 'count'})
         const postingDays = Array.isArray(latestInsight['10_posting_days'])
             ? latestInsight['10_posting_days'].map((item: any) => ({
-                day: item.day || item.day_name || 'Bilinmiyor',
+                day: item.day || item.index || '',
                 count: item.count || 0
             }))
             : [];
 
-        // Transform experience levels
+        // Transform experience levels - Python: rename(columns={'index': 'level', 'exp_years': 'count'})
         const experienceLevels = Array.isArray(latestInsight['11_experience_levels'])
             ? latestInsight['11_experience_levels'].map((item: any) => ({
-                level: item.level || item.exp_level || 'Bilinmiyor',
+                level: item.level || item.index || '',
+                count: item.count || 0
+            }))
+            : [];
+
+        // Transform employment types - Python: rename(columns={'index': 'type', 'job_employment_type': 'count'})
+        const employmentTypes = Array.isArray(latestInsight['14_employment_types'])
+            ? latestInsight['14_employment_types'].map((item: any) => ({
+                type: item.type || item.index || '',
                 count: item.count || 0
             }))
             : [];
@@ -139,9 +165,9 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
                 topTitles,
                 topCities,
                 remoteStats: remoteData,
-                topEmployers: latestInsight['4_top_employers'] || [],
+                topEmployers,
                 salaryStats: salaryData,
-                publishers: latestInsight['6_publishers'] || [],
+                publishers,
                 topSkills: topSkillsArray,
                 topStates,
                 educationLevels: educationLevelsArray,
@@ -151,7 +177,7 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
                 skillSalaryRoi: Array.isArray(latestInsight['13_skill_salary_roi'])
                     ? latestInsight['13_skill_salary_roi']
                     : [],
-                employmentTypes: latestInsight['14_employment_types'] || []
+                employmentTypes
             }
         });
     } catch (error) {
