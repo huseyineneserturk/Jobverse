@@ -389,7 +389,7 @@ const Analytics = () => {
                   </p>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">YıllıkMaksimum Maaş</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Yıllık Maksimum Maaş</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">
                     {formatCurrency(chartData.salaryStats?.max_salary || 0)}
                   </p>
