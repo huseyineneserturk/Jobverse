@@ -95,25 +95,37 @@ def run_pipeline():
         "total_jobs_analyzed": len(df)
     }
 
-    # 1. En Popüler Unvanlar
+    # 1. En Popüler Unvanlar (Pandas 2.x uyumlu)
     if 'job_title' in df.columns:
-        daily_report["1_top_titles"] = df['job_title'].value_counts().head(10).reset_index().rename(
-            columns={'index': 'job_title', 'job_title': 'count'}).to_dict(orient='records')
+        title_counts = df['job_title'].value_counts().head(10)
+        daily_report["1_top_titles"] = [
+            {"job_title": str(title), "count": int(count)} 
+            for title, count in title_counts.items()
+        ]
 
     # 2. Şehirler
     if 'job_city' in df.columns:
-        daily_report["2_top_cities"] = df['job_city'].value_counts().head(10).reset_index().rename(
-            columns={'index': 'city', 'job_city': 'count'}).to_dict(orient='records')
+        city_counts = df['job_city'].value_counts().head(10)
+        daily_report["2_top_cities"] = [
+            {"city": str(city), "count": int(count)} 
+            for city, count in city_counts.items()
+        ]
 
     # 3. Remote Durumu
     if 'job_is_remote' in df.columns:
-        daily_report["3_remote_stats"] = df['job_is_remote'].value_counts().reset_index().rename(
-            columns={'index': 'is_remote', 'job_is_remote': 'count'}).to_dict(orient='records')
+        remote_counts = df['job_is_remote'].value_counts()
+        daily_report["3_remote_stats"] = [
+            {"is_remote": bool(is_remote), "count": int(count)} 
+            for is_remote, count in remote_counts.items()
+        ]
 
     # 4. İşverenler
     if 'employer_name' in df.columns:
-        daily_report["4_top_employers"] = df['employer_name'].value_counts().head(10).reset_index().rename(
-            columns={'index': 'employer', 'employer_name': 'count'}).to_dict(orient='records')
+        employer_counts = df['employer_name'].value_counts().head(10)
+        daily_report["4_top_employers"] = [
+            {"employer": str(employer), "count": int(count)} 
+            for employer, count in employer_counts.items()
+        ]
 
     # 5. Maaş Analizi
     salary_df = df.dropna(subset=['avg_salary'])
@@ -129,8 +141,11 @@ def run_pipeline():
 
     # 6. Yayıncılar
     if 'job_publisher' in df.columns:
-        daily_report["6_publishers"] = df['job_publisher'].value_counts().head(10).reset_index().rename(
-            columns={'index': 'publisher', 'job_publisher': 'count'}).to_dict(orient='records')
+        publisher_counts = df['job_publisher'].value_counts().head(10)
+        daily_report["6_publishers"] = [
+            {"publisher": str(pub), "count": int(count)} 
+            for pub, count in publisher_counts.items()
+        ]
 
     # 7. Yetenekler
     keywords = ['python', 'sql', 'java', 'react', 'aws', 'docker', 'kubernetes', 'c#', 'javascript', 'linux',
@@ -140,8 +155,11 @@ def run_pipeline():
 
     # 8. Eyaletler
     if 'job_state' in df.columns:
-        daily_report["8_top_states"] = df['job_state'].value_counts().head(10).reset_index().rename(
-            columns={'index': 'state', 'job_state': 'count'}).to_dict(orient='records')
+        state_counts = df['job_state'].value_counts().head(10)
+        daily_report["8_top_states"] = [
+            {"state": str(state), "count": int(count)} 
+            for state, count in state_counts.items()
+        ]
 
     # 9. Eğitim
     edu_keys = {'bachelor': ['bachelor', 'bs degree'], 'master': ['master', 'ms degree'], 'phd': ['phd', 'doctorate']}
@@ -154,8 +172,11 @@ def run_pipeline():
 
     # 10. Haftanın Günleri
     if 'day_name' in df.columns:
-        daily_report["10_posting_days"] = df['day_name'].value_counts().reset_index().rename(
-            columns={'index': 'day', 'day_name': 'count'}).to_dict(orient='records')
+        day_counts = df['day_name'].value_counts()
+        daily_report["10_posting_days"] = [
+            {"day": str(day), "count": int(count)} 
+            for day, count in day_counts.items()
+        ]
 
     # 11. Deneyim
     def extract_years(text):
@@ -167,9 +188,11 @@ def run_pipeline():
     try:
         bins = [0, 2, 5, 8, 50]
         labels = ['Junior (0-2)', 'Mid (3-5)', 'Senior (5-8)', 'Lead (8+)']
-        daily_report["11_experience_levels"] = pd.cut(df['exp_years'], bins=bins,
-                                                      labels=labels).value_counts().reset_index().rename(
-            columns={'index': 'level', 'exp_years': 'count'}).to_dict(orient='records')
+        exp_series = pd.cut(df['exp_years'], bins=bins, labels=labels).value_counts()
+        daily_report["11_experience_levels"] = [
+            {"level": str(level), "count": int(count)} 
+            for level, count in exp_series.items() if pd.notna(level)
+        ]
     except:
         daily_report["11_experience_levels"] = []
 
@@ -191,8 +214,11 @@ def run_pipeline():
 
     # 14. İstihdam Türü
     if 'job_employment_type' in df.columns:
-        daily_report["14_employment_types"] = df['job_employment_type'].value_counts().reset_index().rename(
-            columns={'index': 'type', 'job_employment_type': 'count'}).to_dict(orient='records')
+        emp_counts = df['job_employment_type'].value_counts()
+        daily_report["14_employment_types"] = [
+            {"type": str(emp_type), "count": int(count)} 
+            for emp_type, count in emp_counts.items()
+        ]
 
     # --- E) ANALİZİ KAYDET ---
     analysis_col.insert_one(daily_report)
