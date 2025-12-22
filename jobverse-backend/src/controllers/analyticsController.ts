@@ -100,69 +100,86 @@ export const getChartData = async (req: Request, res: Response): Promise<void> =
             };
         }
 
-        // Transform top titles - check all possible field names
+        // Python script field names:
+        // 1_top_titles: {job_title: string, count: number}
+        // 2_top_cities: {city: string, count: number}
+        // 4_top_employers: {employer: string, count: number}
+        // 6_publishers: {publisher: string, count: number}
+        // 8_top_states: {state: string, count: number}
+        // 10_posting_days: {day: string, count: number}
+        // 11_experience_levels: {level: string, count: number}
+        // 14_employment_types: {type: string, count: number}
+
         const topTitles = Array.isArray(latestInsight['1_top_titles'])
-            ? latestInsight['1_top_titles'].map((item: any) => {
-                // Get first non-null string field as title
-                const title = Object.values(item).find(v => typeof v === 'string') || '';
-                return { title, count: item.count || 0 };
-            })
+            ? latestInsight['1_top_titles']
+                .filter((item: any) => item.job_title && item.job_title.trim() !== '')
+                .map((item: any) => ({
+                    title: item.job_title,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform top cities
         const topCities = Array.isArray(latestInsight['2_top_cities'])
-            ? latestInsight['2_top_cities'].map((item: any) => {
-                const city = Object.values(item).find(v => typeof v === 'string') || '';
-                return { city, count: item.count || 0 };
-            })
+            ? latestInsight['2_top_cities']
+                .filter((item: any) => item.city && item.city.trim() !== '')
+                .map((item: any) => ({
+                    city: item.city,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform top states
         const topStates = Array.isArray(latestInsight['8_top_states'])
-            ? latestInsight['8_top_states'].map((item: any) => {
-                const state = Object.values(item).find(v => typeof v === 'string') || '';
-                return { state, count: item.count || 0 };
-            })
+            ? latestInsight['8_top_states']
+                .filter((item: any) => item.state && item.state.trim() !== '')
+                .map((item: any) => ({
+                    state: item.state,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform top employers
         const topEmployers = Array.isArray(latestInsight['4_top_employers'])
-            ? latestInsight['4_top_employers'].map((item: any) => {
-                const employer = Object.values(item).find(v => typeof v === 'string') || '';
-                return { employer, count: item.count || 0 };
-            })
+            ? latestInsight['4_top_employers']
+                .filter((item: any) => item.employer && item.employer.trim() !== '')
+                .map((item: any) => ({
+                    employer: item.employer,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform publishers
         const publishers = Array.isArray(latestInsight['6_publishers'])
-            ? latestInsight['6_publishers'].map((item: any) => {
-                const publisher = Object.values(item).find(v => typeof v === 'string') || '';
-                return { publisher, count: item.count || 0 };
-            })
+            ? latestInsight['6_publishers']
+                .filter((item: any) => item.publisher && item.publisher.trim() !== '')
+                .map((item: any) => ({
+                    publisher: item.publisher,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform posting days
         const postingDays = Array.isArray(latestInsight['10_posting_days'])
-            ? latestInsight['10_posting_days'].map((item: any) => {
-                const day = Object.values(item).find(v => typeof v === 'string') || '';
-                return { day, count: item.count || 0 };
-            })
+            ? latestInsight['10_posting_days']
+                .filter((item: any) => item.day && item.day.trim() !== '')
+                .map((item: any) => ({
+                    day: item.day,
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform experience levels
         const experienceLevels = Array.isArray(latestInsight['11_experience_levels'])
-            ? latestInsight['11_experience_levels'].map((item: any) => {
-                const level = Object.values(item).find(v => typeof v === 'string') || '';
-                return { level, count: item.count || 0 };
-            })
+            ? latestInsight['11_experience_levels']
+                .filter((item: any) => item.level && String(item.level).trim() !== '')
+                .map((item: any) => ({
+                    level: String(item.level),
+                    count: item.count || 0
+                }))
             : [];
 
-        // Transform employment types
         const employmentTypes = Array.isArray(latestInsight['14_employment_types'])
-            ? latestInsight['14_employment_types'].map((item: any) => {
-                const type = Object.values(item).find(v => typeof v === 'string') || '';
-                return { type, count: item.count || 0 };
-            })
+            ? latestInsight['14_employment_types']
+                .filter((item: any) => item.type && item.type.trim() !== '')
+                .map((item: any) => ({
+                    type: item.type,
+                    count: item.count || 0
+                }))
             : [];
 
         res.json({
