@@ -21,9 +21,10 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
-  const fullName = user?.name || 'Kullanıcı';
+  const fullName = user?.displayName || user?.name || 'Kullanıcı';
   const firstName = fullName.split(' ')[0];
   const userInitial = firstName.charAt(0).toUpperCase();
+  const profilePhoto = user?.profilePhotoURL || user?.photoURL || null;
 
   // Dışarı tıklanınca menüyü kapat
   useEffect(() => {
@@ -69,48 +70,48 @@ const Header = () => {
 
           {/* Menü Linkleri */}
           <div className="flex items-center gap-6">
-          <ul className="hidden md:flex gap-6 text-sm font-medium text-slate-300">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                isActive
-                  ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
-                  : 'hover:text-white transition-all'
-              }
-            >
-              Ana Sayfa
-            </NavLink>
-            <NavLink
-              to="/jobs"
-              className={({ isActive }) =>
-                isActive
-                  ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
-                  : 'hover:text-white transition-all'
-              }
-            >
-              İlanlar
-            </NavLink>
-            <NavLink
-              to="/analytics"
-              className={({ isActive }) =>
-                isActive
-                  ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
-                  : 'hover:text-white transition-all'
-              }
-            >
-              Analizler
-            </NavLink>
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                isActive
-                  ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
-                  : 'hover:text-white transition-all'
-              }
-            >
-              Hakkımızda
-            </NavLink>
-          </ul>
+            <ul className="hidden md:flex gap-6 text-sm font-medium text-slate-300">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
+                    : 'hover:text-white transition-all'
+                }
+              >
+                Ana Sayfa
+              </NavLink>
+              <NavLink
+                to="/jobs"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
+                    : 'hover:text-white transition-all'
+                }
+              >
+                İlanlar
+              </NavLink>
+              <NavLink
+                to="/analytics"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
+                    : 'hover:text-white transition-all'
+                }
+              >
+                Analizler
+              </NavLink>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  isActive
+                    ? 'text-white font-semibold underline decoration-sky-500 underline-offset-4'
+                    : 'hover:text-white transition-all'
+                }
+              >
+                Hakkımızda
+              </NavLink>
+            </ul>
           </div>
 
           {/* Auth Butonları */}
@@ -130,100 +131,108 @@ const Header = () => {
                 onClick={() => setIsMenuOpen((prev) => !prev)}
                 className="flex items-center gap-2 focus:outline-none"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs md:text-sm font-semibold text-slate-100 border border-slate-500 shadow-sm">
-                  {userInitial}
-                </div>
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt={fullName}
+                    className="h-8 w-8 rounded-full object-cover border border-slate-500 shadow-sm"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs md:text-sm font-semibold text-slate-100 border border-slate-500 shadow-sm">
+                    {userInitial}
+                  </div>
+                )}
                 <div className="hidden md:flex items-center leading-tight text-right">
                   <span className="text-sm font-semibold text-white">{fullName}</span>
                 </div>
               </button>
 
-               {/* Dropdown menü */}
-               {isMenuOpen && (
-                 <div className="absolute right-0 md:right-[-1.5rem] lg:right-[-3rem] top-10 w-56 rounded-xl bg-slate-900/95 border border-slate-700 shadow-xl py-1 text-sm backdrop-blur z-50">
-                   <div className="px-3 py-2 border-b border-slate-700/60">
-                     <p className="text-xs text-slate-400">Oturum açtınız</p>
-                     <p className="text-sm font-semibold text-white truncate">
-                       {fullName}
-                     </p>
-                   </div>
+              {/* Dropdown menü */}
+              {isMenuOpen && (
+                <div className="absolute right-0 md:right-[-1.5rem] lg:right-[-3rem] top-10 w-56 rounded-xl bg-slate-900/95 border border-slate-700 shadow-xl py-1 text-sm backdrop-blur z-50">
+                  <div className="px-3 py-2 border-b border-slate-700/60">
+                    <p className="text-xs text-slate-400">Oturum açtınız</p>
+                    <p className="text-sm font-semibold text-white truncate">
+                      {fullName}
+                    </p>
+                  </div>
 
-                   <button
-                     type="button"
-                     onClick={() => {
-                       setIsMenuOpen(false);
-                       navigate('/profile');
-                     }}
-                     className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
-                   >
-                     <svg
-                       xmlns="http://www.w3.org/2000/svg"
-                       viewBox="0 0 24 24"
-                       className="h-4 w-4"
-                       fill="none"
-                       stroke="currentColor"
-                       strokeWidth="1.8"
-                       strokeLinecap="round"
-                       strokeLinejoin="round"
-                     >
-                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
-                       <path d="M4 20c0-2.761 3.134-5 7-5s7 2.239 7 5" />
-                     </svg>
-                     <span>Profili Düzenle</span>
-                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate('/profile');
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                      <path d="M4 20c0-2.761 3.134-5 7-5s7 2.239 7 5" />
+                    </svg>
+                    <span>Profili Düzenle</span>
+                  </button>
 
-                   <button
-                     type="button"
-                     onClick={() => {
-                       setIsMenuOpen(false);
-                       navigate('/saved-jobs');
-                     }}
-                     className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
-                   >
-                     <svg
-                       xmlns="http://www.w3.org/2000/svg"
-                       viewBox="0 0 24 24"
-                       className="h-4 w-4"
-                       fill="none"
-                       stroke="currentColor"
-                       strokeWidth="1.8"
-                       strokeLinecap="round"
-                       strokeLinejoin="round"
-                     >
-                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                     </svg>
-                     <span>Kaydedilen İlanlar</span>
-                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate('/saved-jobs');
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span>Kaydedilen İlanlar</span>
+                  </button>
 
-                   <button
-                     type="button"
-                     onClick={() => {
-                       setIsMenuOpen(false);
-                       navigate('/cv-upload');
-                     }}
-                     className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
-                   >
-                     <svg
-                       xmlns="http://www.w3.org/2000/svg"
-                       viewBox="0 0 24 24"
-                       className="h-4 w-4"
-                       fill="none"
-                       stroke="currentColor"
-                       strokeWidth="1.8"
-                       strokeLinecap="round"
-                       strokeLinejoin="round"
-                     >
-                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                       <polyline points="14 2 14 8 20 8" />
-                       <line x1="16" y1="13" x2="8" y2="13" />
-                       <line x1="16" y1="17" x2="8" y2="17" />
-                       <polyline points="10 9 9 9 8 9" />
-                     </svg>
-                     <span>CV Yükle</span>
-                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate('/cv-upload');
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-slate-100 hover:bg-slate-800/80 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <span>CV Yükle</span>
+                  </button>
 
-                   <button
-                     type="button"
+                  <button
+                    type="button"
                     onClick={handleLogoutClick}
                     className="w-full flex items-center gap-2 px-3 py-2 text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-colors"
                   >
