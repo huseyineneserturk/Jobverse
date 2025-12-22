@@ -101,14 +101,17 @@ const Profile = () => {
     try {
       const result = await uploadProfilePhoto(profileImage);
 
+      if (!result.success) {
+        setError(result.error || 'Fotoğraf yüklenirken bir hata oluştu.');
+        return;
+      }
+
       // Backend'den dönen imageUrl'i user'a kaydet
-      const updatedUser = { ...user, profileImage: result.imageUrl };
+      const updatedUser = { ...user, profileImage: result.data?.imageUrl };
       setUser(updatedUser);
 
-      // localStorage'ı güncelle (AuthContext'teki user güncellenir)
-      localStorage.setItem('authUser', JSON.stringify(updatedUser));
-
       setProfileImage(null);
+      setProfileImagePreview(result.data?.imageUrl);
       setSuccessMessage('Profil fotoğrafı başarıyla yüklendi.');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
